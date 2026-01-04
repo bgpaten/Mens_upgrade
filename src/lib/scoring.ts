@@ -1,5 +1,5 @@
 // Scoring engine for v1.1 - Deterministic rule-based scoring
-import type { Habit, PeriodEntry, DomainScores, Domain, Streaks, Recommendations, RecommendationItem, PeriodScore } from './types';
+import type { GoalItem, PeriodEntry, DomainScores, Domain, Streaks, Recommendations, RecommendationItem, PeriodScore } from './types';
 import { getPeriodEntries } from "./supabase-v11";
 import { getTodayKey } from './periods';
 import { subDays } from 'date-fns';
@@ -8,8 +8,10 @@ import { checkBadges } from './badges';
 /**
  * Compute score for a single habit based on its value and weight
  */
-function computeHabitScore(habit: Habit, value: any): number {
-  const { inputType, config, weight } = habit;
+function computeHabitScore(habit: GoalItem, value: any): number {
+  const inputType = habit.targetType || (habit as any).inputType;
+  const config = (habit as any).config;
+  const weight = habit.weight || 0;
 
   let rawScore = 0;
 
@@ -18,19 +20,19 @@ function computeHabitScore(habit: Habit, value: any): number {
       rawScore = value ? 100 : 0;
       break;
 
-    case 'number':
+    case 'numeric':
       if (config?.min !== undefined && config?.max !== undefined) {
-        const normalized = Math.min(Math.max(value, config.min), config.max);
+        const normalized = Math.min(Math.max(Number(value), config.min), config.max);
         rawScore = ((normalized - config.min) / (config.max - config.min)) * 100;
       } else {
-        rawScore = Math.min(value, 100);
+        rawScore = Math.min(Number(value), 100);
       }
       break;
 
-    case 'rating':
+    case 'scale':
       const min = config?.min || 1;
       const max = config?.max || 5;
-      rawScore = ((value - min) / (max - min)) * 100;
+      rawScore = ((Number(value) - min) / (max - min)) * 100;
       break;
 
     case 'time':
@@ -38,12 +40,7 @@ function computeHabitScore(habit: Habit, value: any): number {
       break;
 
     case 'text':
-    case 'select':
       rawScore = value ? 50 : 0;
-      break;
-
-    case 'photo':
-      rawScore = value ? 100 : 0;
       break;
 
     default:
@@ -59,7 +56,7 @@ function computeHabitScore(habit: Habit, value: any): number {
 export function computeDomainScore(
   domain: Domain,
   entries: Record<string, PeriodEntry>,
-  habits: Habit[]
+  habits: GoalItem[]
 ): number {
   const domainHabits = habits.filter(h => h.domain === domain && h.active);
   
@@ -72,7 +69,7 @@ export function computeDomainScore(
     const entry = entries[habit.id];
     if (entry && entry.completed) {
       totalWeightedScore += computeHabitScore(habit, entry.value);
-      totalWeight += habit.weight;
+      totalWeight += habit.weight || 0;
     }
   });
 
@@ -87,7 +84,7 @@ export function computeDomainScore(
 function applyPenalties(
   domainScores: DomainScores,
   entries: Record<string, PeriodEntry>,
-  habits: Habit[]
+  habits: GoalItem[]
 ): DomainScores {
   const penalizedScores = { ...domainScores };
 
@@ -137,7 +134,7 @@ export async function calculateStreaks(userId: string): Promise<Streaks> {
         e.habitId.includes('workout') || e.habitId.includes('Workout')
       );
       
-      if (workoutEntry?.value === true) {
+      if (workoutEntry && (Boolean(workoutEntry.value) === true || Number(workoutEntry.value) > 0)) {
         workoutStreak++;
       } else {
         break;
@@ -167,7 +164,7 @@ export async function calculateStreaks(userId: string): Promise<Streaks> {
         e.habitId.includes('stalking') || e.habitId.includes('Stalking')
       );
       
-      if (!stalkingEntry || stalkingEntry.value === false) {
+      if (!stalkingEntry || Boolean(stalkingEntry.value) === false || Number(stalkingEntry.value) === 0) {
         noContactStreak++;
       } else {
         break;
@@ -288,7 +285,7 @@ export async function computePeriodScore(
   userId: string,
   periodKey: string,
   entries: Record<string, PeriodEntry>,
-  habits: Habit[],
+  habits: GoalItem[],
   previousBadges: string[] = []
 ): Promise<PeriodScore> {
   let domainScores: DomainScores = {

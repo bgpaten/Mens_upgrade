@@ -1,5 +1,5 @@
 // Default habits catalog templates for seeding new users
-import type { Habit, Domain, PeriodType, InputType } from './types';
+import type { GoalItem, Domain, PeriodType, InputType } from './types';
 
 interface HabitTemplate {
   domain: Domain;
@@ -427,25 +427,50 @@ export const DEFAULT_HABITS: HabitTemplate[] = [
 /**
  * Generate habit catalog for a new user
  */
-export function generateDefaultHabits(): Habit[] {
-  return DEFAULT_HABITS.map((template, index) => ({
-    id: `habit_${index + 1}`,
-    ...template,
-    active: true,
-    createdAt: new Date().toISOString()
-  }));
+export function generateDefaultHabits(userId: string): GoalItem[] {
+  return DEFAULT_HABITS.map((template, index) => {
+    // Map domain to category
+    let category: any = 'Health';
+    if (template.domain === 'appearance') category = 'Appearance';
+    if (template.domain === 'finance') category = 'Finance';
+    if (template.domain === 'discipline') category = 'Discipline';
+    if (template.domain === 'emotion') category = 'Emotion';
+
+    // Map inputType to targetType
+    let targetType: any = 'boolean';
+    if (template.inputType === 'number') targetType = 'numeric';
+    if (template.inputType === 'rating') targetType = 'scale';
+    if (template.inputType === 'time') targetType = 'time';
+    if (template.inputType === 'text') targetType = 'text';
+    if (template.inputType === 'photo') targetType = 'text';
+
+    return {
+      id: `habit_${index + 1}`,
+      userId,
+      title: template.name,
+      description: template.config?.unit ? `Unit: ${template.config.unit}` : undefined,
+      category,
+      period: template.periodType,
+      targetType,
+      targetValue: template.config?.min || 0,
+      isHardFail: false,
+      active: true,
+      createdAt: new Date().toISOString(),
+      weight: template.weight // Keep weight for scoring compatibility
+    };
+  });
 }
 
 /**
  * Get habits filtered by period type
  */
-export function getHabitsByPeriod(habits: Habit[], periodType: PeriodType): Habit[] {
-  return habits.filter(h => h.active && h.periodType === periodType);
+export function getHabitsByPeriod(habits: GoalItem[], period: any): GoalItem[] {
+  return habits.filter(h => h.active && (h.frequency === period || h.period === period));
 }
 
 /**
  * Get habits filtered by domain
  */
-export function getHabitsByDomain(habits: Habit[], domain: Domain): Habit[] {
-  return habits.filter(h => h.active && h.domain === domain);
+export function getHabitsByDomain(habits: GoalItem[], category: any): GoalItem[] {
+  return habits.filter(h => h.active && h.category === category);
 }

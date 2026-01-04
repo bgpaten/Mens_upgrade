@@ -1,8 +1,6 @@
-// Dynamic habit input component based on habit type
-import { useState } from 'react';
 import type { Habit } from '@/lib/types';
 import { cn } from '@/lib/utils';
-import { Upload, X } from 'lucide-react';
+import { Upload } from 'lucide-react';
 
 interface HabitInputProps {
   habit: Habit;

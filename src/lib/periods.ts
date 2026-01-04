@@ -1,5 +1,5 @@
 // Period helper utilities for v1.1
-import { format, startOfWeek, startOfMonth, endOfMonth, isLastDayOfMonth, getDay } from 'date-fns';
+import { format, startOfWeek, isLastDayOfMonth, getDay } from 'date-fns';
 
 export type PeriodType = 'daily' | 'weekly' | 'monthly';
 

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/components/AuthProvider';
 import { getDailyReport, getUserGoals, getDailyLog } from '@/lib/supabase-v11';
-import { isGoalDue, generateDailyReport } from '@/lib/reporting';
+import { isGoalDue } from '@/lib/reporting';
 import type { DailyReport } from '@/lib/types';
 import { format } from 'date-fns';
 import { ArrowLeft, Loader2, CheckCircle2, XCircle, FileText, Printer } from 'lucide-react';

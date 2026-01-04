@@ -1,6 +1,6 @@
 // Period status component - shows completion status for periods
 import { CheckCircle2, Clock, Lock } from 'lucide-react';
-import { cn } from '@/lib/utils';
+
 import { getPeriodLabel } from '@/lib/periods';
 
 interface PeriodStatusProps {

@@ -1,5 +1,5 @@
-import { auth } from './lib/firebase';
-import { seedDefaultGoals } from './lib/seed_data';
+// import { auth } from './lib/firebase';
+// import { seedDefaultGoals } from './lib/seed_data';
 
 /**
  * 🚀 Seed Default Goals Script
@@ -19,6 +19,7 @@ import { seedDefaultGoals } from './lib/seed_data';
  */
 
 async function runSeed() {
+    /* 
     const user = auth.currentUser;
     
     if (!user) {
@@ -34,6 +35,8 @@ async function runSeed() {
     } catch (error) {
         console.error('❌ Error seeding goals:', error);
     }
+    */
+    console.warn('runSeed is deprecated (Firebase legacy)');
 }
 
 // Auto-run if called directly

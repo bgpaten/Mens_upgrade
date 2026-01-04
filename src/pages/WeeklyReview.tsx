@@ -24,7 +24,7 @@ export default function WeeklyReview() {
   const navigate = useNavigate();
   const { showToast } = useToast();
 
-  const { initialized, loading: initLoading } = useV11Initialization();
+  const { loading: initLoading } = useV11Initialization();
   const { periods, triggerWeekly } = useCurrentPeriods();
   const weekPeriod = periods.weekly;
 
@@ -43,8 +43,10 @@ export default function WeeklyReview() {
   }, [entries]);
 
   const habitsByDomain = habits.reduce((acc, habit) => {
-    if (!acc[habit.domain]) acc[habit.domain] = [];
-    acc[habit.domain].push(habit);
+    const domain = habit.domain || (habit.category?.toLowerCase() as Domain);
+    if (!domain) return acc;
+    if (!acc[domain]) acc[domain] = [];
+    acc[domain].push(habit);
     return acc;
   }, {} as Record<Domain, typeof habits>);
 

@@ -54,8 +54,10 @@ export default function CheckIn() {
 
   // Group habits by domain
   const habitsByDomain = habits.reduce((acc, habit) => {
-    if (!acc[habit.domain]) acc[habit.domain] = [];
-    acc[habit.domain].push(habit);
+    const domain = habit.domain || (habit.category?.toLowerCase() as Domain);
+    if (!domain) return acc;
+    if (!acc[domain]) acc[domain] = [];
+    acc[domain].push(habit);
     return acc;
   }, {} as Record<Domain, typeof habits>);
 

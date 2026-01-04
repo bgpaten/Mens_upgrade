@@ -2,9 +2,9 @@
 import { useEffect, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
-import type { Habit, PeriodEntry, PeriodType } from '@/lib/types';
+import type { GoalItem as _GoalItem, PeriodType } from '@/lib/types';
 import {
-  getUserHabits,
+  getUserGoals,
   getPeriodEntries,
   savePeriodEntry,
   isPeriodCompleted,
@@ -12,7 +12,7 @@ import {
   hasCompletedV11Setup,
   initializeV11ForUser
 } from '@/lib/supabase-v11';
-import { getTodayKey, getWeekKey, getMonthKey, isPeriodEligible, getPeriodKey } from '@/lib/periods';
+import { getTodayKey, getWeekKey, getMonthKey, isPeriodEligible } from '@/lib/periods';
 
 /**
  * Hook to initialize v1.1 for user (one-time setup)
@@ -60,7 +60,7 @@ export function useHabits() {
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return [];
-      return getUserHabits(user.id);
+      return getUserGoals(user.id);
     },
     staleTime: 5 * 60 * 1000 // 5 minutes
   });
@@ -72,7 +72,7 @@ export function useHabits() {
 export function useHabitsByPeriod(periodType: PeriodType) {
   const { data: allHabits = [], ...rest } = useHabits();
   
-  const habits = allHabits.filter(h => h.periodType === periodType);
+  const habits = allHabits.filter(h => h.period === periodType || h.frequency === periodType);
   
   return { data: habits, ...rest };
 }

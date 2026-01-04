@@ -6,9 +6,17 @@ interface AuthContextType {
   session: Session | null;
   user: User | null;
   loading: boolean;
+  hasProfile: boolean;
+  error: string | null;
 }
 
-const AuthContext = createContext<AuthContextType>({ session: null, user: null, loading: true });
+const AuthContext = createContext<AuthContextType>({ 
+  session: null, 
+  user: null, 
+  loading: true,
+  hasProfile: false,
+  error: null
+});
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
@@ -36,7 +44,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ session, user, loading }}>
+    <AuthContext.Provider value={{ session, user, loading, hasProfile: !!user, error: null }}>
       {children}
     </AuthContext.Provider>
   );

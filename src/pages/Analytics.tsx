@@ -2,10 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { format, subDays } from 'date-fns';
 import { 
   Trophy, 
-  Target, 
   Zap, 
   AlertCircle, 
-  Calendar, 
   TrendingUp, 
   XCircle,
   Clock,
