@@ -1,17 +1,19 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, 
-  CheckSquare, 
+  Target,
+  FileText,
   BarChart3, 
-  Menu
+  Settings
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const mobileNavItems = [
-  { icon: LayoutDashboard, label: 'Home', path: '/' },
-  { icon: CheckSquare, label: 'Log', path: '/check-in' },
-  { icon: BarChart3, label: 'Stats', path: '/analytics' },
-  { icon: Menu, label: 'More', path: '/settings' },
+  { icon: LayoutDashboard, label: 'Today', path: '/' },
+  { icon: Target, label: 'Goals', path: '/goals' },
+  { icon: FileText, label: 'Report', path: '/report' },
+  { icon: BarChart3, label: 'Analytics', path: '/analytics' },
+  { icon: Settings, label: 'Settings', path: '/settings' },
 ];
 
 export function BottomNav() {
